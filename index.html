@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Focus Timer Pro</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #ff9a9e, #fbc2eb, #a6c1ee);
+        background-size: 300% 300%;
+        animation: gradientMove 10s ease infinite;
+    }
+
+    @keyframes gradientMove {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+
+    .box {
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(15px);
+        padding: 40px;
+        border-radius: 30px;
+        text-align: center;
+        width: 320px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        color: #fff;
+    }
+
+    h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+    }
+
+    input {
+        width: 80px;
+        padding: 10px;
+        border-radius: 15px;
+        border: none;
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 15px;
+        outline: none;
+        background: rgba(255,255,255,0.8);
+    }
+
+    .time {
+        font-size: 64px;
+        font-weight: bold;
+        margin: 20px 0;
+        text-shadow: 0 0 15px rgba(255,255,255,0.5);
+    }
+
+    button {
+        border: none;
+        padding: 10px 16px;
+        margin: 5px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        background: linear-gradient(135deg, #ff6ec4, #7873f5);
+        color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    .status {
+        margin-top: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+
+    .progress {
+        height: 6px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #00f2fe, #4facfe);
+        transition: width 1s linear;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h1>Focus Boost</h1>
+
+    <input id="minutesInput" type="number" placeholder="min" min="1">
+
+    <div class="time" id="time">00:00</div>
+
+    <div>
+        <button onclick="setTime()">Set</button>
+        <button onclick="start()">Start</button>
+        <button onclick="pause()">Pause</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="status" id="status">Ready</div>
+</div>
+
+<script>
+let totalSeconds = 0;
+let initialTime = 0;
+let timer = null;
+let running = false;
+
+const timeDisplay = document.getElementById("time");
+const statusLabel = document.getElementById("status");
+const progressBar = document.getElementById("progressBar");
+
+function updateDisplay() {
+    let m = Math.floor(totalSeconds / 60);
+    let s = totalSeconds % 60;
+
+    timeDisplay.textContent = 
+        String(m).padStart(2, '0') + ":" + 
+        String(s).padStart(2, '0');
+
+    if (initialTime > 0) {
+        let progress = ((initialTime - totalSeconds) / initialTime) * 100;
+        progressBar.style.width = progress + "%";
+    } else {
+        progressBar.style.width = "0%";
+    }
+}
+
+// 🔊 ГУЧНА ТА ЗАТИШНА КУХОННА АРФА
+function playPremiumSound() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+
+    function createHarpString(freq, startTime, duration, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'triangle';
+        // Легкий розлив частоти для живого звучання
+        osc.frequency.setValueAtTime(freq + (Math.random() * 2 - 1), now + startTime);
+
+        gain.gain.setValueAtTime(0, now + startTime);
+        
+        // Трохи чіткіша атака для кращої чутності (0.015 замість 0.02)
+        gain.gain.linearRampToValueAtTime(vol, now + startTime + 0.015); 
+        
+        // Підтримуємо гучність трохи довше перед згасанням
+        gain.gain.exponentialRampToValueAtTime(vol * 0.4, now + startTime + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + startTime);
+        osc.stop(now + startTime + duration);
+    }
+
+    // Реліз залишаємо довгим для красивої луни
+    const release = 4.0;
+
+    // Підняли гучність (було 0.1 -> стало 0.3 для основи)
+    // 1. Теплий фундамент
+    createHarpString(440.00, 0, release, 0.3);         // A4
+    
+    // 2. Мелодійний перелив (не лінійний ритм)
+    createHarpString(587.33, 0.15, release, 0.25);     // D5
+    createHarpString(880.00, 0.32, release, 0.22);     // A5
+    createHarpString(1174.66, 0.55, release, 0.18);    // D6
+
+    // 3. Фінальний "золотий" відблиск (F#) — тепер чіткіший
+    createHarpString(1479.98, 0.9, release + 1, 0.15); // F#6
+}
+
+function setTime() {
+    let min = document.getElementById("minutesInput").value;
+    if (!min || min <= 0) return;
+
+    totalSeconds = min * 60;
+    initialTime = totalSeconds;
+
+    updateDisplay();
+    statusLabel.textContent = "Ready";
+}
+
+function start() {
+    if (running || totalSeconds <= 0) return;
+
+    running = true;
+    statusLabel.textContent = "Running";
+
+    timer = setInterval(() => {
+        if (totalSeconds > 0) {
+            totalSeconds--;
+            updateDisplay();
+        } else {
+            clearInterval(timer);
+            running = false;
+            statusLabel.textContent = "Time's up!";
+            playPremiumSound(); // Виклик покращеного звуку
+        }
+    }, 1000);
+}
+
+function pause() {
+    clearInterval(timer);
+    running = false;
+    statusLabel.textContent = "Paused";
+}
+
+function reset() {
+    clearInterval(timer);
+    running = false;
+    totalSeconds = 0;
+    initialTime = 0;
+    updateDisplay();
+    statusLabel.textContent = "Reset";
+}
+
+updateDisplay();
+</script>
+
+</body>
+</html>
