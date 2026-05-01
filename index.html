@@ -26,22 +26,22 @@
     .box {
         background: rgba(255,255,255,0.2);
         backdrop-filter: blur(15px);
-        padding: 25px;              /* ↓ зменшено */
+        padding: 25px;
         border-radius: 25px;
         text-align: center;
-        width: 240px;               /* ↓ було 320px */
+        width: 240px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         color: #fff;
     }
 
     h1 {
-        font-size: 16px;            /* ↓ було 22px */
+        font-size: 16px;
         margin-bottom: 10px;
         letter-spacing: 1px;
     }
 
     input {
-        width: 60px;               /* ↓ було 80px */
+        width: 60px;
         padding: 6px;
         border-radius: 12px;
         border: none;
@@ -53,7 +53,7 @@
     }
 
     .time {
-        font-size: 40px;           /* ↓ було 64px */
+        font-size: 40px;
         font-weight: bold;
         margin: 15px 0;
         text-shadow: 0 0 10px rgba(255,255,255,0.4);
@@ -61,7 +61,7 @@
 
     button {
         border: none;
-        padding: 7px 10px;         /* ↓ менше */
+        padding: 7px 10px;
         margin: 4px;
         border-radius: 10px;
         cursor: pointer;
@@ -165,10 +165,10 @@ function playPremiumSound() {
 
         gain.gain.setValueAtTime(0, now + startTime);
         
-        // Трохи чіткіша атака для кращої чутності (0.015 замість 0.02)
+        // Чітка атака (0.015s)
         gain.gain.linearRampToValueAtTime(vol, now + startTime + 0.015); 
         
-        // Підтримуємо гучність трохи довше перед згасанням
+        // Підтримка гучності перед згасанням
         gain.gain.exponentialRampToValueAtTime(vol * 0.4, now + startTime + 0.12);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + startTime + duration);
 
@@ -179,19 +179,17 @@ function playPremiumSound() {
         osc.stop(now + startTime + duration);
     }
 
-    // Реліз залишаємо довгим для красивої луни
     const release = 4.0;
 
-    // Підняли гучність (було 0.1 -> стало 0.3 для основи)
     // 1. Теплий фундамент
     createHarpString(440.00, 0, release, 0.3);         // A4
     
-    // 2. Мелодійний перелив (не лінійний ритм)
+    // 2. Мелодійний перелив
     createHarpString(587.33, 0.15, release, 0.25);     // D5
     createHarpString(880.00, 0.32, release, 0.22);     // A5
     createHarpString(1174.66, 0.55, release, 0.18);    // D6
 
-    // 3. Фінальний "золотий" відблиск (F#) — тепер чіткіший
+    // 3. Фінальний золотий відблиск
     createHarpString(1479.98, 0.9, release + 1, 0.15); // F#6
 }
 
