@@ -26,74 +26,70 @@
     .box {
         background: rgba(255,255,255,0.2);
         backdrop-filter: blur(15px);
-        padding: 40px;
-        border-radius: 30px;
+        padding: 25px;              /* ↓ зменшено */
+        border-radius: 25px;
         text-align: center;
-        width: 320px;
+        width: 240px;               /* ↓ було 320px */
         box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         color: #fff;
     }
 
     h1 {
-        font-size: 22px;
+        font-size: 16px;            /* ↓ було 22px */
         margin-bottom: 10px;
         letter-spacing: 1px;
     }
 
     input {
-        width: 80px;
-        padding: 10px;
-        border-radius: 15px;
+        width: 60px;               /* ↓ було 80px */
+        padding: 6px;
+        border-radius: 12px;
         border: none;
         text-align: center;
-        font-size: 16px;
-        margin-bottom: 15px;
+        font-size: 14px;
+        margin-bottom: 12px;
         outline: none;
         background: rgba(255,255,255,0.8);
     }
 
     .time {
-        font-size: 64px;
+        font-size: 40px;           /* ↓ було 64px */
         font-weight: bold;
-        margin: 20px 0;
-        text-shadow: 0 0 15px rgba(255,255,255,0.5);
+        margin: 15px 0;
+        text-shadow: 0 0 10px rgba(255,255,255,0.4);
     }
 
     button {
         border: none;
-        padding: 10px 16px;
-        margin: 5px;
-        border-radius: 12px;
+        padding: 7px 10px;         /* ↓ менше */
+        margin: 4px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: bold;
+        font-size: 12px;
         background: linear-gradient(135deg, #ff6ec4, #7873f5);
         color: white;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: 0.2s;
     }
 
     button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    button:active {
-        transform: scale(0.95);
     }
 
     .status {
-        margin-top: 15px;
-        font-size: 14px;
+        margin-top: 12px;
+        font-size: 12px;
         font-weight: bold;
         text-transform: uppercase;
         opacity: 0.9;
     }
 
     .progress {
-        height: 6px;
+        height: 5px;
         background: rgba(255,255,255,0.2);
         border-radius: 10px;
         overflow: hidden;
-        margin-top: 20px;
+        margin-top: 15px;
     }
 
     .progress-bar {
@@ -142,8 +138,8 @@ function updateDisplay() {
     let m = Math.floor(totalSeconds / 60);
     let s = totalSeconds % 60;
 
-    timeDisplay.textContent = 
-        String(m).padStart(2, '0') + ":" + 
+    timeDisplay.textContent =
+        String(m).padStart(2, '0') + ":" +
         String(s).padStart(2, '0');
 
     if (initialTime > 0) {
@@ -154,49 +150,38 @@ function updateDisplay() {
     }
 }
 
-// 🔊 ГУЧНА ТА ЗАТИШНА КУХОННА АРФА
+/* 🔊 PREMIUM SOFT MELODY (clean + not squeaky) */
 function playPremiumSound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
 
-    function createHarpString(freq, startTime, duration, vol) {
+    function tone(freq, time, duration, vol) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        
-        osc.type = 'triangle';
-        // Легкий розлив частоти для живого звучання
-        osc.frequency.setValueAtTime(freq + (Math.random() * 2 - 1), now + startTime);
+        const filter = ctx.createBiquadFilter();
 
-        gain.gain.setValueAtTime(0, now + startTime);
-        
-        // Трохи чіткіша атака для кращої чутності (0.015 замість 0.02)
-        gain.gain.linearRampToValueAtTime(vol, now + startTime + 0.015); 
-        
-        // Підтримуємо гучність трохи довше перед згасанням
-        gain.gain.exponentialRampToValueAtTime(vol * 0.4, now + startTime + 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + startTime + duration);
+        osc.type = "triangle";
 
-        osc.connect(gain);
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1200, now + time);
+
+        osc.frequency.setValueAtTime(freq, now + time);
+
+        gain.gain.setValueAtTime(0.0001, now + time);
+        gain.gain.exponentialRampToValueAtTime(vol, now + time + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + time + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
         gain.connect(ctx.destination);
 
-        osc.start(now + startTime);
-        osc.stop(now + startTime + duration);
+        osc.start(now + time);
+        osc.stop(now + time + duration);
     }
 
-    // Реліз залишаємо довгим для красивої луни
-    const release = 4.0;
-
-    // Підняли гучність (було 0.1 -> стало 0.3 для основи)
-    // 1. Теплий фундамент
-    createHarpString(440.00, 0, release, 0.3);         // A4
-    
-    // 2. Мелодійний перелив (не лінійний ритм)
-    createHarpString(587.33, 0.15, release, 0.25);     // D5
-    createHarpString(880.00, 0.32, release, 0.22);     // A5
-    createHarpString(1174.66, 0.55, release, 0.18);    // D6
-
-    // 3. Фінальний "золотий" відблиск (F#) — тепер чіткіший
-    createHarpString(1479.98, 0.9, release + 1, 0.15); // F#6
+    tone(440, 0.0, 0.5, 0.35);
+    tone(659.25, 0.2, 0.6, 0.3);
+    tone(523.25, 0.4, 0.7, 0.25);
 }
 
 function setTime() {
@@ -223,8 +208,8 @@ function start() {
         } else {
             clearInterval(timer);
             running = false;
-            statusLabel.textContent = "Time's up!";
-            playPremiumSound(); // Виклик покращеного звуку
+            statusLabel.textContent = "Done";
+            playPremiumSound();
         }
     }, 1000);
 }
@@ -248,4 +233,5 @@ updateDisplay();
 </script>
 
 </body>
+</html>
 </html>
