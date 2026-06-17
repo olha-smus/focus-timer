@@ -2,88 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Prep Ritual Timer</title>
+<title>Focus Timer</title>
 
 <style>
     :root {
-        --cream: #F6EBDD;
-        --paper: #FFF8EF;
-        --paper-soft: #FBF0E5;
+        --paper: #F7F2EB;
+        --paper-soft: #FBF6EF;
+
         --terracotta: #C98263;
-        --terracotta-dark: #A96750;
         --sage: #8B9475;
-        --sage-dark: #70795E;
         --sage-soft: #DDE2D0;
+
         --brown: #6B4D3D;
         --muted: #A88975;
         --line: #E7D5C4;
-        --shadow: rgba(107, 77, 61, 0.16);
+        --ring-track: #EADBCD;
+
+        --btn-set: #C5A19A;
+        --btn-set-dark: #AD867E;
+
+        --btn-start: #C98263;
+        --btn-start-dark: #AE6D55;
+
+        --btn-pause: #87977E;
+        --btn-pause-dark: #718268;
+
+        --btn-reset: #B8A477;
+        --btn-reset-dark: #9F8B63;
     }
 
     * {
         box-sizing: border-box;
     }
 
+    html,
     body {
         margin: 0;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background:
-            radial-gradient(circle at 18% 20%, rgba(201,130,99,0.13), transparent 30%),
-            radial-gradient(circle at 82% 80%, rgba(139,148,117,0.17), transparent 34%),
-            linear-gradient(135deg, #FAF3EA, var(--cream));
+        padding: 0;
+        width: max-content;
+        height: max-content;
+        min-width: 0;
+        min-height: 0;
+        background: transparent;
+        overflow: hidden;
         font-family: "Segoe UI", Arial, sans-serif;
         color: var(--brown);
     }
 
+    body {
+        display: block;
+    }
+
     .timer {
-        width: 380px;
-        padding: 30px 28px 28px;
-        border-radius: 34px;
-        background:
-            linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,248,239,0.96)),
-            var(--paper);
-        border: 1px solid rgba(201,130,99,0.24);
-        box-shadow: 0 28px 70px var(--shadow);
+        width: 340px;
+        margin: 0;
+        padding: 22px 18px 16px;
+        border-radius: 24px;
+        background: var(--paper);
+        border: 1px solid rgba(221, 204, 187, 0.75);
         position: relative;
         overflow: hidden;
-    }
-
-    .timer::before {
-        content: "";
-        position: absolute;
-        inset: 14px;
-        border: 1px solid rgba(231,213,196,0.85);
-        border-radius: 25px;
-        pointer-events: none;
-    }
-
-    .timer::after {
-        content: "";
-        position: absolute;
-        top: -42px;
-        right: -42px;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background: rgba(201,130,99,0.08);
+        box-shadow: none;
     }
 
     .content {
         position: relative;
         z-index: 2;
+        text-align: center;
     }
 
     .top {
-        text-align: center;
-        margin-bottom: 24px;
+        margin-bottom: 18px;
     }
 
     .eyebrow {
         font-size: 10px;
-        letter-spacing: 2.5px;
+        letter-spacing: 2.7px;
         text-transform: uppercase;
         color: var(--sage);
         font-weight: 800;
@@ -101,7 +95,7 @@
 
     .subtitle {
         margin: 10px auto 0;
-        max-width: 260px;
+        max-width: 255px;
         font-size: 13px;
         line-height: 1.45;
         color: var(--muted);
@@ -110,30 +104,25 @@
     .circle-wrap {
         display: flex;
         justify-content: center;
-        margin: 24px 0 22px;
+        margin: 20px 0;
     }
 
     .circle {
         --angle: 0deg;
-
-        width: 220px;
-        height: 220px;
+        width: 194px;
+        height: 194px;
         border-radius: 50%;
-        padding: 12px;
-        background:
-            conic-gradient(var(--terracotta) var(--angle), #EADBCD 0deg);
-        box-shadow:
-            0 18px 36px rgba(107,77,61,0.13),
-            inset 0 0 0 1px rgba(201,130,99,0.14);
+        padding: 8px;
+        background: conic-gradient(var(--terracotta) var(--angle), var(--ring-track) 0deg);
         position: relative;
     }
 
     .circle::before {
         content: "";
         position: absolute;
-        inset: 24px;
+        inset: 20px;
         border-radius: 50%;
-        border: 1px dashed rgba(139,148,117,0.35);
+        border: 1px dashed rgba(139,148,117,0.28);
         pointer-events: none;
     }
 
@@ -141,9 +130,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background:
-            radial-gradient(circle at 50% 32%, #FFFDF8, var(--paper-soft));
-        border: 1px solid rgba(231,213,196,0.95);
+        background: radial-gradient(circle at 50% 32%, #FFFDF8, var(--paper-soft));
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -162,10 +149,10 @@
     }
 
     .status {
-        padding: 7px 14px;
+        padding: 7px 15px;
         border-radius: 999px;
         background: rgba(221,226,208,0.78);
-        color: var(--sage-dark);
+        color: #70795E;
         font-size: 10px;
         letter-spacing: 1.4px;
         text-transform: uppercase;
@@ -210,19 +197,22 @@
     }
 
     .preset {
-        border: 1px solid rgba(139,148,117,0.35);
-        background: rgba(221,226,208,0.55);
-        color: var(--sage-dark);
-        box-shadow: none;
-        width: auto;
         height: 30px;
-        padding: 0 12px;
+        padding: 0 13px;
+        border-radius: 999px;
+        border: 1px solid rgba(139,148,117,0.26);
+        background: rgba(221,226,208,0.72);
+        color: #6F785E;
         font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        transition: 0.2s ease;
     }
 
     .preset:hover {
-        background: rgba(221,226,208,0.9);
-        color: var(--sage-dark);
+        background: #CBD3BC;
+        transform: translateY(-1px);
     }
 
     .buttons {
@@ -236,45 +226,72 @@
         border: none;
         border-radius: 999px;
         cursor: pointer;
-        background: var(--terracotta);
-        color: #FFFDF8;
         font-size: 12px;
         font-weight: 800;
-        box-shadow: 0 9px 18px rgba(201,130,99,0.22);
+        letter-spacing: 0.2px;
+        color: #FFF8EF;
         transition: 0.2s ease;
+    }
+
+    .btn-set {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.16), transparent),
+            var(--btn-set);
+    }
+
+    .btn-start {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.16), transparent),
+            var(--btn-start);
+    }
+
+    .btn-pause {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.14), transparent),
+            var(--btn-pause);
+    }
+
+    .btn-reset {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.16), transparent),
+            var(--btn-reset);
+    }
+
+    .btn-set:hover {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.12), transparent),
+            var(--btn-set-dark);
+    }
+
+    .btn-start:hover {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.12), transparent),
+            var(--btn-start-dark);
+    }
+
+    .btn-pause:hover {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.12), transparent),
+            var(--btn-pause-dark);
+    }
+
+    .btn-reset:hover {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,0.12), transparent),
+            var(--btn-reset-dark);
     }
 
     button:hover {
         transform: translateY(-1px);
-        background: var(--terracotta-dark);
-    }
-
-    button.sage {
-        background: var(--sage);
-        box-shadow: 0 9px 18px rgba(139,148,117,0.22);
-    }
-
-    button.sage:hover {
-        background: var(--sage-dark);
-    }
-
-    .bottom-note {
-        margin-top: 18px;
-        padding-top: 15px;
-        border-top: 1px solid var(--line);
-        text-align: center;
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.45;
     }
 
     .botanical {
         position: absolute;
-        left: 26px;
-        bottom: 22px;
+        left: 18px;
+        bottom: 10px;
         width: 68px;
         height: 34px;
-        opacity: 0.58;
+        opacity: 0.42;
     }
 
     .stem {
@@ -322,22 +339,24 @@
 <div class="timer">
     <div class="content">
         <div class="top">
-            <div class="eyebrow">Kitchen Routine</div>
+            <div class="eyebrow">KITCHEN ROUTINE</div>
             <h1>Focus Timer</h1>
-            <p class="subtitle">A gentle timer for cooking, baking, planning, and slow kitchen moments.</p>
+            <p class="subtitle">
+                A gentle timer for cooking, baking, planning, and slow kitchen moments.
+            </p>
         </div>
 
         <div class="circle-wrap">
             <div class="circle" id="timerCircle">
                 <div class="circle-inner">
                     <div class="time" id="time">00:00</div>
-                    <div class="status" id="status">Ready</div>
+                    <div class="status" id="status">READY</div>
                 </div>
             </div>
         </div>
 
         <div class="input-area">
-            <input id="minutesInput" type="number" placeholder="" min="1">
+            <input id="minutesInput" type="number" min="1">
             <span class="input-label">minutes</span>
         </div>
 
@@ -348,14 +367,10 @@
         </div>
 
         <div class="buttons">
-            <button onclick="setTime()">Set</button>
-            <button onclick="start()">Start</button>
-            <button class="sage" onclick="pause()">Pause</button>
-            <button class="sage" onclick="reset()">Reset</button>
-        </div>
-
-        <div class="bottom-note">
-            Designed for calm meal prep, cozy recipes, and mindful weekly planning.
+            <button class="btn-set" onclick="setTime()">Set</button>
+            <button class="btn-start" onclick="start()">Start</button>
+            <button class="btn-pause" onclick="pause()">Pause</button>
+            <button class="btn-reset" onclick="reset()">Reset</button>
         </div>
     </div>
 
@@ -396,10 +411,14 @@ function updateDisplay() {
 }
 
 function setPreset(minutes) {
+    clearInterval(timer);
+    running = false;
+
     minutesInput.value = minutes;
     totalSeconds = minutes * 60;
     initialTime = totalSeconds;
-    statusLabel.textContent = "Ready";
+
+    statusLabel.textContent = "READY";
     updateDisplay();
 }
 
@@ -413,7 +432,7 @@ function setTime() {
     totalSeconds = min * 60;
     initialTime = totalSeconds;
 
-    statusLabel.textContent = "Ready";
+    statusLabel.textContent = "READY";
     updateDisplay();
 }
 
@@ -421,7 +440,7 @@ function start() {
     if (running || totalSeconds <= 0) return;
 
     running = true;
-    statusLabel.textContent = "Running";
+    statusLabel.textContent = "RUNNING";
 
     timer = setInterval(() => {
         if (totalSeconds > 0) {
@@ -430,7 +449,7 @@ function start() {
         } else {
             clearInterval(timer);
             running = false;
-            statusLabel.textContent = "Done";
+            statusLabel.textContent = "DONE";
             playPremiumSound();
         }
     }, 1000);
@@ -439,15 +458,18 @@ function start() {
 function pause() {
     clearInterval(timer);
     running = false;
-    statusLabel.textContent = "Paused";
+    statusLabel.textContent = "PAUSED";
 }
 
 function reset() {
     clearInterval(timer);
     running = false;
+
     totalSeconds = 0;
     initialTime = 0;
-    statusLabel.textContent = "Reset";
+    minutesInput.value = "";
+
+    statusLabel.textContent = "READY";
     updateDisplay();
 }
 
